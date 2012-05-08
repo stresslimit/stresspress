@@ -77,20 +77,24 @@ function sld_rm_post_custom_fields() {
 
 // make cleaner better permalink urls
 function sld_url_cleaner_clean($slug) {
-   	// remove everything except letters, numbers and -
-   	$pattern = '~([^a-z0-9\-])~i';
-   	$replacement = '';
-   	$slug = preg_replace($pattern, $replacement, $slug);
+	// make sure to replace spaces with dashes
+	$slug = str_replace( ' ', '-', $slug);
 
-   	// when more than one - , replace it with one only
-   	$pattern = '~\-\-+~';
-   	$replacement = '-';
-   	$slug = preg_replace($pattern, $replacement, $slug);
+	// remove everything except letters, numbers and -
+	$pattern = '~([^a-z0-9\-])~i';
+	$replacement = '';
+	$slug = preg_replace($pattern, $replacement, $slug);
 
-   	return $slug;
-   }
-   add_filter('editable_slug', 'sld_url_cleaner_clean');
+	// when more than one - , replace it with one only
+	$pattern = '~\-\-+~';
+	$replacement = '-';
+	$slug = preg_replace($pattern, $replacement, $slug);
 
+	return $slug;
+}
+add_filter('editable_slug', 'sld_url_cleaner_clean');
+
+// add conditional for login page
 function is_login_page() {
     return in_array($GLOBALS['pagenow'], array('wp-login.php', 'wp-register.php'));
 }
@@ -115,10 +119,16 @@ function setup_postmeta_all( $post=false ) {
 	$sql = "
 		SELECT `meta_key`, `meta_value`
 		FROM `$wpdb->postmeta`
-		WHERE `post_id` = $post_id
+		WHERE `post_id` = $post->ID
 	";
 	$wpdb->query($sql);
-	foreach($wpdb->last_result as $k => $v){
+	foreach($wpdb->last_result as $k => $v) {
+		if ( isset ( $post->{$v->meta_key} ) ) {
+			if ( !is_array($post->{$v->meta_key}) ) {
+				$post->{$v->meta_key} = array( $post->{$v->meta_key} );
+			}
+			$post->{$v->meta_key}[] = $v->meta_value;
+		} else
 		$post->{$v->meta_key} = $v->meta_value;
 	};
 	return $post;
