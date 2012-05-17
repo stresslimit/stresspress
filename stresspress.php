@@ -47,6 +47,12 @@ function sld_rm_dashboard_widgets() {
 	// unset($wp_meta_boxes['dashboard']['normal']['core']['dashboard_recent_comments']);      // comments
 }
 
+// who uses Links ? goodbye 2005...
+add_action('admin_menu', 'sld_manage_menu_items', 99);
+function sld_manage_menu_items() {
+	remove_menu_page('link-manager.php');
+}
+
 // remove unwanted metaboxes
 // these are managed through Screen Options, but in case you want to disable them 
 // entirely, here they are. Disabled for now, so post edit screen is per default.
