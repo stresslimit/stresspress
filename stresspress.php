@@ -50,6 +50,9 @@ function sld_rm_dashboard_widgets() {
 // who uses Links ? goodbye 2005...
 add_action('admin_menu', 'sld_manage_menu_items', 99);
 function sld_manage_menu_items() {
+	// we can do this based on permissions too if we want
+	if( !current_user_can( 'administrator' ) ) {
+	}
 	remove_menu_page('link-manager.php'); // Links
 	// remove_menu_page('edit.php'); // Posts
 	// remove_menu_page('upload.php'); // Media
