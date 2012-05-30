@@ -159,15 +159,14 @@ function sld_get_post_thumbnail( $postid, $size='thumbnail' ) {
 	} else {
 		// echo 'has no thumbnail';
 		$post = get_post( $postid );
-		if ( preg_match_all('/<img.+class=[\'"].*wp-image-([\d]*).?[\'"].*>/i', $post->post_content, $matches) ) {
-			// var_dump($matches);
+		if ( preg_match_all( '/<img [^>]class=["|\'][^"|\']*wp-image-([\d]+)/i', $post->post_content, $matches) ) {
 			$img_id = @$matches[1][0];
 			return wp_get_attachment_image( $img_id, $size );
-		} else if ( preg_match_all('/<img.+src=[\'"]([^\'"])[\'"].*>/i', $post->post_content, $matches) ) {
+		} else if ( preg_match_all( '/<img [^>]*src=["|\']([^"|\']+)/i', $post->post_content, $matches) ) {
 			// get sizes dimensions from wp
 			$img = @$matches[1][0];
 			return '<img src="'.$img.'">';
-		}
+		}		
 
 	}
 }
