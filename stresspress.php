@@ -195,7 +195,7 @@ add_action('admin_head', 'sld_admin_styles');
 
 // login logo link url
 function login_header_url() {
-	echo 'http://stresslimitdesign.com';
+	return 'http://stresslimitdesign.com';
 }
 add_filter( 'login_headerurl', 'login_header_url' );
 
