@@ -65,6 +65,16 @@ function sld_manage_menu_items() {
 	// remove_menu_page('options-general.php'); // Settings
 }
 
+// remove the +NEW items from the admin bar
+add_action( 'wp_before_admin_bar_render', 'sld_admin_bar' );
+function sld_admin_bar() {
+    global $wp_admin_bar;
+    // $wp_admin_bar->remove_menu( 'new-post' );
+    $wp_admin_bar->remove_menu( 'new-media' );
+    $wp_admin_bar->remove_menu( 'new-link' );
+    // $wp_admin_bar->remove_menu( 'comments' );
+}
+
 // remove unwanted metaboxes
 // these are managed through Screen Options, but in case you want to disable them 
 // entirely, here they are. Disabled for now, so post edit screen is per default.
