@@ -210,13 +210,13 @@ add_action('admin_head', 'sld_admin_styles');
 
 // login logo link url
 function login_header_url() {
-	return 'http://stresslimitdesign.com';
+	return home_url();
 }
 add_filter( 'login_headerurl', 'login_header_url' );
 
 // admin footer branding
 function sld_admin_footer_brand() {
-	echo date("Y").' <a href="http://stresslimitdesign.com">stresslimitdesign</a>';
+  	return date("Y") .' <a href="http://stresslimitdesign.com">stresslimitdesign</a> <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">cc</a>';
 } 
 add_filter('admin_footer_text', 'sld_admin_footer_brand');
 
