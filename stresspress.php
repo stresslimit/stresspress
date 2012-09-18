@@ -185,6 +185,13 @@ function sld_post_thumbnail( $postid, $size='thumbnail' ) {
 	echo sld_get_post_thumbnail( $postid, $size );
 }
 
+// add shortcode to template_url to be able to reference
+add_shortcode( 'template_url', 'sld_template_url' );
+function sld_template_url( $atts ) {
+	return get_bloginfo('template_url');
+}
+
+
 
 /*-----------------------------------
    Stresslimit admin branding
