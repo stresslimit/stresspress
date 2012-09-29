@@ -158,6 +158,13 @@ function sld_post_thumbnail( $postid, $size='thumbnail' ) {
 	echo sld_get_post_thumbnail( $postid, $size );
 }
 
+function sld_page_slug_body_class( $classes ) {
+    global $post;
+    if ( !empty( $post ) )
+        $classes[] = $post->post_type . '-' . $post->post_name;
+    return $classes;
+}
+add_filter( 'body_class', 'sld_page_slug_body_class' );
 
 /*-----------------------------------
    Stresslimit admin branding
