@@ -27,11 +27,20 @@ remove_action('wp_head', 'parent_post_rel_link', 10, 0);
 add_theme_support('post-thumbnails');
 register_nav_menus();
 
-// Limit post revisions: this should go in wp-config
-// define('WP_POST_REVISIONS', 5);
 
-// disable file editor
-define('DISALLOW_FILE_EDIT',true);
+/*-----------------------------------
+   wp-config.php stuff
+-------------------------------------*/
+
+// define('WP_POST_REVISIONS', 5 );		// Limit post revisions: int or false
+// define( 'DISALLOW_FILE_EDIT', true );	// Disable file editor
+define( 'EMPTY_TRASH_DAYS', 1 );		// Purge trash interval
+define( 'AUTOSAVE_INTERVAL', 60 );		// Autosave every N seconds
+
+
+/*-----------------------------------
+   admin stuff
+-------------------------------------*/
 
 // remove unwanted core dashboard widgets
 add_action('wp_dashboard_setup', 'sld_rm_dashboard_widgets');
@@ -100,43 +109,13 @@ function sld_rm_post_custom_fields() {
 
 
 /*-----------------------------------
-	Misc
+	Frontend functions
 -------------------------------------*/
-
-// make cleaner better permalink urls
-function sld_url_cleaner_clean($slug) {
-	// make sure to replace spaces with dashes
-	$slug = str_replace( ' ', '-', $slug);
-
-	// remove everything except letters, numbers and -
-	$pattern = '~([^a-z0-9\-])~i';
-	$replacement = '';
-	$slug = preg_replace($pattern, $replacement, $slug);
-
-	// when more than one - , replace it with one only
-	$pattern = '~\-\-+~';
-	$replacement = '-';
-	$slug = preg_replace($pattern, $replacement, $slug);
-
-	return $slug;
-}
-add_filter('editable_slug', 'sld_url_cleaner_clean');
 
 // add conditional for login page
 function is_login_page() {
     return in_array($GLOBALS['pagenow'], array('wp-login.php', 'wp-register.php'));
 }
-
-// add post type class to body admin 
-function sld_admin_body_class( $classes ) {
-	global $wpdb, $post;
-	$post_type = get_post_type( $post->ID );
-	if ( is_admin() ) {
-		$classes .= 'type-' . $post_type;
-	}
-	return $classes;
-}
-add_filter( 'admin_body_class', 'sld_admin_body_class' );
 
 // grab all post meta into $post object [could be resource intensive]
 function setup_postmeta_all( $post=false ) {
@@ -185,19 +164,54 @@ function sld_post_thumbnail( $postid, $size='thumbnail' ) {
 	echo sld_get_post_thumbnail( $postid, $size );
 }
 
+
+/*-----------------------------------
+	Utility functions
+-------------------------------------*/
+
+// make cleaner better permalink urls; this might be solved in core by now [todo] check wp/trunk
+add_filter('editable_slug', 'sld_url_cleaner_clean');
+function sld_url_cleaner_clean($slug) {
+	// make sure to replace spaces with dashes
+	$slug = str_replace( ' ', '-', $slug);
+
+	// remove everything except letters, numbers and -
+	$pattern = '~([^a-z0-9\-])~i';
+	$replacement = '';
+	$slug = preg_replace($pattern, $replacement, $slug);
+
+	// when more than one - , replace it with one only
+	$pattern = '~\-\-+~';
+	$replacement = '-';
+	$slug = preg_replace($pattern, $replacement, $slug);
+
+	return $slug;
+}
+
+add_filter( 'admin_body_class', 'sld_admin_body_class' );
+// add post type class to body admin 
+function sld_admin_body_class( $classes ) {
+	global $wpdb, $post;
+	$post_type = get_post_type( $post->ID );
+	if ( is_admin() ) {
+		$classes .= 'type-' . $post_type;
+	}
+	return $classes;
+}
+
+add_filter( 'body_class', 'sld_page_slug_body_class' );
 function sld_page_slug_body_class( $classes ) {
     global $post;
     if ( !empty( $post ) )
         $classes[] = $post->post_type . '-' . $post->post_name;
     return $classes;
 }
-add_filter( 'body_class', 'sld_page_slug_body_class' );
 
 // add shortcode to template_url to be able to reference
+add_shortcode( 'template_url', 'sld_template_url' );
 function sld_template_url( $atts ) {
 	return get_bloginfo('template_url');
 }
-add_shortcode( 'template_url', 'sld_template_url' );
 
 
 
