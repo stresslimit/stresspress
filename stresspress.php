@@ -34,8 +34,8 @@ register_nav_menus();
 
 // define('WP_POST_REVISIONS', 5 );		// Limit post revisions: int or false
 // define( 'DISALLOW_FILE_EDIT', true );	// Disable file editor
-define( 'EMPTY_TRASH_DAYS', 1 );		// Purge trash interval
-define( 'AUTOSAVE_INTERVAL', 60 );		// Autosave every N seconds
+// define( 'EMPTY_TRASH_DAYS', 1 );		// Purge trash interval
+// define( 'AUTOSAVE_INTERVAL', 60 );		// Autosave every N seconds
 
 
 /*-----------------------------------
@@ -111,6 +111,22 @@ function sld_rm_post_custom_fields() {
 /*-----------------------------------
 	Frontend functions
 -------------------------------------*/
+
+// Reduce nav classes, leaving only 'current-menu-item'
+function nav_class_filter( $var, $item ) {
+	$var = is_array($var) ? array_intersect($var, array('current-menu-item', 'current-menu-parent', 'current-menu-ancestor')) : '';
+	if ( is_array($var) )
+		$var[] = 'nav-'. sanitize_title( $item->title );
+	return $var;
+}
+add_filter('nav_menu_css_class', 'nav_class_filter', 10, 2 );
+
+//	Remove nav IDs
+function nav_id_filter( $id, $item ) {
+	return '';
+}
+add_filter( 'nav_menu_item_id', 'nav_id_filter', 10, 2 );
+
 
 // add conditional for login page
 function is_login_page() {
