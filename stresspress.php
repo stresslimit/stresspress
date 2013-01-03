@@ -133,30 +133,6 @@ function is_login_page() {
     return in_array($GLOBALS['pagenow'], array('wp-login.php', 'wp-register.php'));
 }
 
-// grab all post meta into $post object [could be resource intensive]
-function setup_postmeta_all( $post=false ) {
-	global $wpdb;
-	// make sure we have a proper $post object, so we can use in templates without args, 
-	// or in special cases where we want to pass the object manually
-	if ( !$post ) global $post;
-	$sql = "
-		SELECT `meta_key`, `meta_value`
-		FROM `$wpdb->postmeta`
-		WHERE `post_id` = $post->ID
-	";
-	$wpdb->query($sql);
-	foreach($wpdb->last_result as $k => $v) {
-		if ( isset ( $post->{$v->meta_key} ) ) {
-			if ( !is_array($post->{$v->meta_key}) ) {
-				$post->{$v->meta_key} = array( $post->{$v->meta_key} );
-			}
-			$post->{$v->meta_key}[] = $v->meta_value;
-		} else
-		$post->{$v->meta_key} = $v->meta_value;
-	};
-	return $post;
-}
-
 // get either the featured image or first image in the post
 function sld_get_post_thumbnail( $postid, $size='thumbnail' ) {
 	if ( has_post_thumbnail( $postid ) ) {
@@ -175,9 +151,31 @@ function sld_get_post_thumbnail( $postid, $size='thumbnail' ) {
 
 	}
 }
-
 function sld_post_thumbnail( $postid, $size='thumbnail' ) {
 	echo sld_get_post_thumbnail( $postid, $size );
+}
+
+// get the src of either the featured image or first image in the post
+function sld_get_post_thumbnail_src( $postid, $size='thumbnail' ) {
+	if ( has_post_thumbnail( $postid ) ) {
+		$id = get_post_thumbnail_id( $postid );
+		$image = wp_get_attachment_image_src( $id, $size );
+		return $image[0];
+	} else {
+		// echo 'has no thumbnail';
+		$post = get_post( $postid );
+		if ( preg_match_all( '/<img [^>]class=["|\'][^"|\']*wp-image-([\d]+)/i', $post->post_content, $matches) ) {
+			$img_id = @$matches[1][0];
+			return wp_get_attachment_image_src( $img_id, $size );
+		} else if ( preg_match_all( '/<img [^>]*src=["|\']([^"|\']+)/i', $post->post_content, $matches) ) {
+			// todo: get sizes dimensions from wp
+			$img = @$matches[1][0];
+			return $img;
+		}		
+	}
+}
+function sld_post_thumbnail_src( $postid, $size='thumbnail' ) {
+	echo sld_get_post_thumbnail_src( $postid, $size );
 }
 
 
